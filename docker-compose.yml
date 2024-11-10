@@ -1,0 +1,57 @@
+services:
+  eazybank-account:
+    build:
+      context: ./account
+    image: 010501180401210102/eazybank-account:1.0.0
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres-db:5432/account
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - eazybank-postgres-db
+    container_name: eazybank-account
+
+  eazybank-cards:
+    build:
+      context: ./cards
+    image: 010501180401210102/eazybank-cards:1.0.0
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres-db:5432/cards
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - eazybank-postgres-db
+    container_name: eazybank-cards
+
+  eazybank-loans:
+    build:
+      context: ./loans
+    image: 010501180401210102/eazybank-loans:1.0.0
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres-db:5432/loans
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - eazybank-postgres-db
+    container_name: eazybank-loans
+
+  eazybank-postgres-db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    container_name: eazybank-postgres-db
+    volumes:
+      - eazybank-postgres-db-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+
+volumes:
+  eazybank-postgres-db-data:

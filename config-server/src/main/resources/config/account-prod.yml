@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+
+build:
+  version: "1.0.0-DEV"
+
+account:
+  message: "Welcome to microservice account (PROD env)"
+  contactDetails:
+    name: "Alfrendo Silalahi - Tech Lead"
+    email: "{cipher}bc7413a2b2b2163a132c03ca72f156e656c7d3cc83878b06b2c15f024304265326bf1726a03bf15e37f0671a699180f0"
+  onCallSupport:
+    - 12345
+    - 67890

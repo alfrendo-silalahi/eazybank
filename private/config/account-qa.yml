@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+
+build:
+  version: "1.0.0-QA"
+
+account:
+  message: "Welcome to microservice account (QA env)"
+  contactDetails:
+    name: "Alan Walker ~ Lead QA"
+    email: alanwalker@email.com
+  onCallSupport:
+    - 99999
+    - 88888
