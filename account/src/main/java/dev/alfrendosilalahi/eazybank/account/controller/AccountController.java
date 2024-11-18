@@ -95,8 +95,8 @@ public class AccountController {
 	}
 
 	@GetMapping("/general-info")
-	public ResponseEntity<AccountConfigProperties> getAccountInfo() {
-		return ResponseEntity.ok(accountConfigProperties);
+	public ResponseEntity<String> getAccountInfo() {
+		return ResponseEntity.ok(accountConfigProperties.getMessage());
 	}
 
 }

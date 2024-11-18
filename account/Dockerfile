@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.12_7-jre-ubi9-minimal
+FROM amazoncorretto:17
 
 WORKDIR /app
 

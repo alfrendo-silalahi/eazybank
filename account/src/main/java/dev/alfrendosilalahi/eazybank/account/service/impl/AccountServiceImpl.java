@@ -52,7 +52,7 @@ public class AccountServiceImpl implements AccountService {
         account.setCustomer(customer);
         customer.setAccount(account);
         customerRepository.save(customer);
-        log.info("Create account completed");
+        log.info("Created account successfully");
     }
 
     /**
