@@ -91,7 +91,7 @@ services:
     ports:
       - "8083:8083"
     depends_on:
-      eazybank-config-server:
+      eazyba nk-config-server:
         condition: service_healthy
       eazybank-postgres:
         condition: service_healthy

@@ -13,7 +13,7 @@ import lombok.*;
 public class Account extends BaseEntity {
 
     @Id
-    private Long number;
+    private Long id;
 
     private String type;
 

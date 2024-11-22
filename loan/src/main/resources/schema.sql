@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS loans (
+CREATE TABLE IF NOT EXISTS loan (
   loan_id SERIAL PRIMARY KEY,
   mobile_number VARCHAR(15) NOT NULL,
   loan_number VARCHAR(100) NOT NULL,

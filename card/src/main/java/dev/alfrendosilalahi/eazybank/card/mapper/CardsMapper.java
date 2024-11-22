@@ -1,28 +1,28 @@
 package dev.alfrendosilalahi.eazybank.card.mapper;
 
 import dev.alfrendosilalahi.eazybank.card.dto.CardsDto;
-import dev.alfrendosilalahi.eazybank.card.entity.Cards;
+import dev.alfrendosilalahi.eazybank.card.entity.Card;
 
 public class CardsMapper {
 
-    public static CardsDto mapToCardsDto(Cards cards, CardsDto cardsDto) {
-        cardsDto.setCardNumber(cards.getCardNumber());
-        cardsDto.setCardType(cards.getCardType());
-        cardsDto.setMobileNumber(cards.getMobileNumber());
-        cardsDto.setTotalLimit(cards.getTotalLimit());
-        cardsDto.setAvailableAmount(cards.getAvailableAmount());
-        cardsDto.setAmountUsed(cards.getAmountUsed());
+    public static CardsDto mapToCardsDto(Card card, CardsDto cardsDto) {
+        cardsDto.setCardNumber(card.getCardNumber());
+        cardsDto.setCardType(card.getCardType());
+        cardsDto.setMobileNumber(card.getMobileNumber());
+        cardsDto.setTotalLimit(card.getTotalLimit());
+        cardsDto.setAvailableAmount(card.getAvailableAmount());
+        cardsDto.setAmountUsed(card.getAmountUsed());
         return cardsDto;
     }
 
-    public static Cards mapToCards(CardsDto cardsDto, Cards cards) {
-        cards.setCardNumber(cardsDto.getCardNumber());
-        cards.setCardType(cardsDto.getCardType());
-        cards.setMobileNumber(cardsDto.getMobileNumber());
-        cards.setTotalLimit(cardsDto.getTotalLimit());
-        cards.setAvailableAmount(cardsDto.getAvailableAmount());
-        cards.setAmountUsed(cardsDto.getAmountUsed());
-        return cards;
+    public static Card mapToCards(CardsDto cardsDto, Card card) {
+        card.setCardNumber(cardsDto.getCardNumber());
+        card.setCardType(cardsDto.getCardType());
+        card.setMobileNumber(cardsDto.getMobileNumber());
+        card.setTotalLimit(cardsDto.getTotalLimit());
+        card.setAvailableAmount(cardsDto.getAvailableAmount());
+        card.setAmountUsed(cardsDto.getAmountUsed());
+        return card;
     }
 
 }

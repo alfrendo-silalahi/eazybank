@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
                 .mobileNumber(customerRequestDto.getMobileNumber())
                 .build();
         Account account = Account.builder()
-                .number(getRandomNumber())
+                .id(getRandomNumber())
                 .type("SAVINGS")
                 .branchAddress("South Jakarta")
                 .build();
@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
                 .mobileNumber(customer.getMobileNumber())
                 .email(customer.getEmail())
                 .branchAddress(customer.getAccount().getBranchAddress())
-                .number(customer.getAccount().getNumber())
+                .number(customer.getAccount().getId())
                 .type(customer.getAccount().getType())
                 .build();
         return new AccountResponseDto(accountResponse);

@@ -1,9 +1,9 @@
-FROM amazoncorretto:17
+FROM amazoncorretto:21
 
 WORKDIR /app
 
-COPY target/account-0.0.1-SNAPSHOT.jar /app
+COPY target/account-1.0.0.jar /app
 
 EXPOSE 8081
 
-CMD ["java", "-jar", "account-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "account-1.0.0.jar"]
