@@ -4,6 +4,6 @@ import dev.alfrendosilalahi.eazybank.account.dto.response.CustomerDetailResponse
 
 public interface CustomerService {
 
-    CustomerDetailResponseDto getCustomerDetail(String mobileNumber);
+    CustomerDetailResponseDto getCustomerDetail(String mobileNumber, String correlationId);
 
 }

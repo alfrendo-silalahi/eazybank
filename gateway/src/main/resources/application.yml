@@ -10,6 +10,13 @@ spring:
           enabled: false
           lower-case-service-id: true
 
+logging:
+  level:
+    dev:
+      alfrendosilalahi:
+        eazybank:
+          gateway: debug
+
 management:
   endpoints:
     web:

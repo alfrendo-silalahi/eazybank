@@ -11,6 +11,13 @@ spring:
 #    username: guest
 #    password: guest
 
+logging:
+  level:
+    dev:
+      alfrendosilalahi:
+        eazybank:
+          loan: debug
+
 server:
   port: 8083
 

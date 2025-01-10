@@ -10,10 +10,12 @@ import dev.alfrendosilalahi.eazybank.account.service.CustomerService;
 import dev.alfrendosilalahi.eazybank.account.service.client.CardFeignClient;
 import dev.alfrendosilalahi.eazybank.account.service.client.LoanFeignClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
@@ -23,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final LoanFeignClient loanFeignClient;
 
     @Override
-    public CustomerDetailResponseDto getCustomerDetail(String mobileNumber) {
+    public CustomerDetailResponseDto getCustomerDetail(String mobileNumber, String correlationId) {
         Customer customer = customerRepository.findByMobileNumber(mobileNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber));
         CustomerDetailResponseDto.AccountResponse accountResponse = CustomerDetailResponseDto.AccountResponse.builder()
@@ -35,8 +37,8 @@ public class CustomerServiceImpl implements CustomerService {
                 .type(customer.getAccount().getType())
                 .build();
 
-        CardsDto cardsDto = cardFeignClient.fetchCardDetails(mobileNumber).getBody();
-        LoansDto loansDto = loanFeignClient.fetchLoanDetails(mobileNumber).getBody();
+        CardsDto cardsDto = cardFeignClient.fetchCardDetails(correlationId, mobileNumber).getBody();
+        LoansDto loansDto = loanFeignClient.fetchLoanDetails(correlationId, mobileNumber).getBody();
         return CustomerDetailResponseDto.builder()
                 .account(accountResponse)
                 .cardsDto(cardsDto)
