@@ -1,32 +1,32 @@
 services:
 
-  eazybank-rabbitmq:
-    image: rabbitmq:3-management
-    hostname: rabbitmq
-    container_name: eazybank-rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    healthcheck:
-      test: rabbitmq-diagnostics check_port_connectivity
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 5s
-    extends:
-      file: ../common-config.yml
-      service: network-deploy-service
+#  eazybank-rabbitmq:
+#    image: rabbitmq:3-management
+#    hostname: rabbitmq
+#    container_name: eazybank-rabbitmq
+#    ports:
+#      - "5672:5672"
+#      - "15672:15672"
+#    healthcheck:
+#      test: rabbitmq-diagnostics check_port_connectivity
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+#      start_period: 5s
+#    extends:
+#      file: ../common-config.yml
+#      service: network-deploy-service
 
-  eazybank-config-server:
-    build:
-      context: ../../config-server
-    image: 010501180401210102/eazybank-config-server:1.0.0
-    container_name: eazybank-config-server
+  eazybank-config:
+#    build:
+#      context: ../../config
+    image: config
+    container_name: eazybank-config
     ports:
       - "8084:8084"
-    depends_on:
-      eazybank-rabbitmq:
-        condition: service_healthy
+#    depends_on:
+#      eazybank-rabbitmq:
+#        condition: service_healthy
     healthcheck:
       test: "curl --fail --silent localhost:8084/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
@@ -41,15 +41,48 @@ services:
       file: ../common-config.yml
       service: microservice-base-config
 
+  eazybank-eureka:
+#    build:
+#      context: ../../eureka
+    image: eureka
+    container_name: eazybank-eureka
+    ports:
+      - "9000:9000"
+    depends_on:
+      eazybank-config:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: eazybank-eureka
+    extends:
+      file: ../common-config.yml
+      service: microservice-config-server-config
+
+  eazybank-gateway:
+#    build:
+#      context: ../../gateway
+    image: gateway
+    container_name: eazybank-gateway
+    ports:
+      - "9090:9090"
+    depends_on:
+      eazybank-config:
+        condition: service_healthy
+
+    environment:
+      SPRING_APPLICATION_NAME: eazybank-gateway
+    extends:
+      file: ../common-config.yml
+      service: microservice-config-server-config
+
   eazybank-account:
-    build:
-      context: ../../account
-    image: 010501180401210102/eazybank-account:1.0.0
+#    build:
+#      context: ../../account
+    image: account
     container_name: eazybank-account
     ports:
       - "8081:8081"
     depends_on:
-      eazybank-config-server:
+      eazybank-config:
         condition: service_healthy
       eazybank-postgres:
         condition: service_healthy
@@ -63,14 +96,14 @@ services:
       service: microservice-config-server-config
 
   eazybank-card:
-    build:
-      context: ../../card
-    image: 010501180401210102/eazybank-card:1.0.0
+#    build:
+#      context: ../../card
+    image: card
     container_name: eazybank-card
     ports:
       - "8082:8082"
     depends_on:
-      eazybank-config-server:
+      eazybank-config:
         condition: service_healthy
       eazybank-postgres:
         condition: service_healthy
@@ -84,20 +117,20 @@ services:
       service: microservice-config-server-config
 
   eazybank-loan:
-    build:
-      context: ../../loan
-    image: 010501180401210102/eazybank-loan:1.0.0
+#    build:
+#      context: ../../loan
+    image: loan
     container_name: eazybank-loan
     ports:
       - "8083:8083"
     depends_on:
-      eazyba nk-config-server:
+      eazybank-config:
         condition: service_healthy
       eazybank-postgres:
         condition: service_healthy
     environment:
       SPRING_APPLICATION_NAME: eazybank-loan
-      SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres:5432/loans
+      SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     extends:
@@ -114,7 +147,7 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - eazybank-postgres-data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./init-db:/docker-entrypoint-initdb.ddi
     networks:
       - eazybank
     healthcheck:
@@ -128,4 +161,5 @@ volumes:
 
 networks:
   eazybank:
+    name: "eazybank"
     driver: "bridge"

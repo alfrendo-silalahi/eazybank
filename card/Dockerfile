@@ -6,4 +6,4 @@ COPY target/card-1.0.0.jar /app
 
 EXPOSE 8082
 
-CMD ["java", "-jar", "card-1.0.0-SNAPSHOT.jar"]
+CMD ["java", "-jar", "card-1.0.0.jar"]
