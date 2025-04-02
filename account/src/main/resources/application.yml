@@ -2,7 +2,7 @@ spring:
   application:
     name: account
   profiles:
-    active: dev
+    active: prod
   config:
     import: "optional:configserver:http://localhost:8084"
 #  rabbitmq:

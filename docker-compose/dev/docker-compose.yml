@@ -1,32 +1,12 @@
 services:
 
-#  eazybank-rabbitmq:
-#    image: rabbitmq:3-management
-#    hostname: rabbitmq
-#    container_name: eazybank-rabbitmq
-#    ports:
-#      - "5672:5672"
-#      - "15672:15672"
-#    healthcheck:
-#      test: rabbitmq-diagnostics check_port_connectivity
-#      interval: 10s
-#      timeout: 5s
-#      retries: 10
-#      start_period: 5s
-#    extends:
-#      file: ../common-config.yml
-#      service: network-deploy-service
-
   eazybank-config:
-#    build:
-#      context: ../../config
+    build:
+      context: ../../config
     image: config
     container_name: eazybank-config
     ports:
       - "8084:8084"
-#    depends_on:
-#      eazybank-rabbitmq:
-#        condition: service_healthy
     healthcheck:
       test: "curl --fail --silent localhost:8084/actuator/health/readiness | grep UP || exit 1"
       interval: 10s
@@ -37,13 +17,12 @@ services:
       resources:
         limits:
           memory: 700m
-    extends:
-      file: ../common-config.yml
-      service: microservice-base-config
+    networks:
+      - eazybank
 
   eazybank-eureka:
-#    build:
-#      context: ../../eureka
+    build:
+      context: ../../eureka
     image: eureka
     container_name: eazybank-eureka
     ports:
@@ -52,14 +31,19 @@ services:
       eazybank-config:
         condition: service_healthy
     environment:
-      SPRING_APPLICATION_NAME: eazybank-eureka
-    extends:
-      file: ../common-config.yml
-      service: microservice-config-server-config
+      SPRING_APPLICATION_NAME: eureka
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://eazybank-config:8084
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - eazybank
 
   eazybank-gateway:
-#    build:
-#      context: ../../gateway
+    build:
+      context: ../../gateway
     image: gateway
     container_name: eazybank-gateway
     ports:
@@ -67,16 +51,20 @@ services:
     depends_on:
       eazybank-config:
         condition: service_healthy
-
+    deploy:
+      resources:
+        limits:
+          memory: 700m
     environment:
-      SPRING_APPLICATION_NAME: eazybank-gateway
-    extends:
-      file: ../common-config.yml
-      service: microservice-config-server-config
+      SPRING_APPLICATION_NAME: gateway
+      SPRING_CONFIG_IMPORT: configserver:http://eazybank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eazybank-eureka:9000/eureka
+    networks:
+      - eazybank
 
   eazybank-account:
-#    build:
-#      context: ../../account
+    build:
+      context: ../../account
     image: account
     container_name: eazybank-account
     ports:
@@ -86,18 +74,24 @@ services:
         condition: service_healthy
       eazybank-postgres:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
     environment:
-      SPRING_APPLICATION_NAME: eazybank-account
+      SPRING_APPLICATION_NAME: account
       SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres:5432/account
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-    extends:
-      file: ../common-config.yml
-      service: microservice-config-server-config
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://eazybank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eazybank-eureka:9000/eureka
+    networks:
+      - eazybank
 
   eazybank-card:
-#    build:
-#      context: ../../card
+    build:
+      context: ../../card
     image: card
     container_name: eazybank-card
     ports:
@@ -107,18 +101,24 @@ services:
         condition: service_healthy
       eazybank-postgres:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
     environment:
-      SPRING_APPLICATION_NAME: eazybank-card
+      SPRING_APPLICATION_NAME: card
       SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres:5432/card
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-    extends:
-      file: ../common-config.yml
-      service: microservice-config-server-config
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://eazybank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eazybank-eureka:9000/eureka
+    networks:
+      - eazybank
 
   eazybank-loan:
-#    build:
-#      context: ../../loan
+    build:
+      context: ../../loan
     image: loan
     container_name: eazybank-loan
     ports:
@@ -128,14 +128,20 @@ services:
         condition: service_healthy
       eazybank-postgres:
         condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
     environment:
-      SPRING_APPLICATION_NAME: eazybank-loan
+      SPRING_APPLICATION_NAME: loan
       SPRING_DATASOURCE_URL: jdbc:postgresql://eazybank-postgres:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-    extends:
-      file: ../common-config.yml
-      service: microservice-config-server-config
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://eazybank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eazybank-eureka:9000/eureka
+    networks:
+      - eazybank
 
   eazybank-postgres:
     image: postgres:latest
@@ -147,11 +153,11 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - eazybank-postgres-data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.ddi
+      - ./init-db:/docker-entrypoint-initdb.d
     networks:
       - eazybank
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
