@@ -52,3 +52,6 @@ info:
     name: loan
     description: "Microservice loan for EazyBank application"
     version: "1.0.0"
+
+# Contact
+contact: 1234567890

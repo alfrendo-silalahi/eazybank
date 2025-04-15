@@ -5,11 +5,10 @@ spring:
     active: prod
   config:
     import: "optional:configserver:http://localhost:8084"
-#  rabbitmq:
-#    host: localhost
-#    port: 5672
-#    username: guest
-#    password: guest
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 server:
   port: 8081
@@ -47,3 +46,24 @@ info:
     name: account
     description: "Microservice account for EazyBank application"
     version: "1.0.0"
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+
+  retry:
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 100
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+#        ignoreExceptions:
+#          - java.lang.NullPointerException
+        retryExceptions:
+          - java.util.concurrent.TimeoutException

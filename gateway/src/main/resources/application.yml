@@ -12,6 +12,11 @@ spring:
       trace:
         enabled: true
 
+      # global timeout configs
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 1s
+
 logging:
   level:
     dev:

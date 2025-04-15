@@ -11,7 +11,10 @@ import dev.alfrendosilalahi.eazybank.account.service.client.CardFeignClient;
 import dev.alfrendosilalahi.eazybank.account.service.client.LoanFeignClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,8 +40,14 @@ public class CustomerServiceImpl implements CustomerService {
                 .type(customer.getAccount().getType())
                 .build();
 
-        CardsDto cardsDto = cardFeignClient.fetchCardDetails(correlationId, mobileNumber).getBody();
-        LoansDto loansDto = loanFeignClient.fetchLoanDetails(correlationId, mobileNumber).getBody();
+        CardsDto cardsDto = null;
+        ResponseEntity<CardsDto> cardsDtoResponseEntity = cardFeignClient.fetchCardDetails(correlationId, mobileNumber);
+        if (Objects.nonNull(cardsDtoResponseEntity)) cardsDto = cardsDtoResponseEntity.getBody();
+
+        LoansDto loansDto = null;
+        ResponseEntity<LoansDto> loansDtoResponseEntity = loanFeignClient.fetchLoanDetails(correlationId, mobileNumber);
+        if (Objects.nonNull(loansDtoResponseEntity)) loansDto = loansDtoResponseEntity.getBody();
+
         return CustomerDetailResponseDto.builder()
                 .account(accountResponse)
                 .cardsDto(cardsDto)
