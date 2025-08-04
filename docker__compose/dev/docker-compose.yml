@@ -1,0 +1,171 @@
+services:
+
+  leafbank-config:
+    build:
+      context: ../../config
+    image: config
+    container_name: leafbank-config
+    ports:
+      - "8084:8084"
+    healthcheck:
+      test: "curl --fail --silent localhost:8084/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - leafbank
+
+  leafbank-eureka:
+    build:
+      context: ../../eureka
+    image: eureka
+    container_name: leafbank-eureka
+    ports:
+      - "9000:9000"
+    depends_on:
+      leafbank-config:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: eureka
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://leafbank-config:8084
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    networks:
+      - leafbank
+
+  leafbank-gateway:
+    build:
+      context: ../../gateway
+    image: gateway
+    container_name: leafbank-gateway
+    ports:
+      - "9090:9090"
+    depends_on:
+      leafbank-config:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_APPLICATION_NAME: gateway
+      SPRING_CONFIG_IMPORT: configserver:http://leafbank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://leafbank-eureka:9000/eureka
+    networks:
+      - leafbank
+
+  leafbank-account:
+    build:
+      context: ../../account
+    image: account
+    container_name: leafbank-account
+    ports:
+      - "8081:8081"
+    depends_on:
+      leafbank-config:
+        condition: service_healthy
+      leafbank-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_APPLICATION_NAME: account
+      SPRING_DATASOURCE_URL: jdbc:postgresql://leafbank-postgres:5432/account
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://leafbank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://leafbank-eureka:9000/eureka
+    networks:
+      - leafbank
+
+  leafbank-card:
+    build:
+      context: ../../card
+    image: card
+    container_name: leafbank-card
+    ports:
+      - "8082:8082"
+    depends_on:
+      leafbank-config:
+        condition: service_healthy
+      leafbank-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_APPLICATION_NAME: card
+      SPRING_DATASOURCE_URL: jdbc:postgresql://leafbank-postgres:5432/card
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://leafbank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://leafbank-eureka:9000/eureka
+    networks:
+      - leafbank
+
+  leafbank-loan:
+    build:
+      context: ../../loan
+    image: loan
+    container_name: leafbank-loan
+    ports:
+      - "8083:8083"
+    depends_on:
+      leafbank-config:
+        condition: service_healthy
+      leafbank-postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_APPLICATION_NAME: loan
+      SPRING_DATASOURCE_URL: jdbc:postgresql://leafbank-postgres:5432/loan
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://leafbank-config:8084
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://leafbank-eureka:9000/eureka
+    networks:
+      - leafbank
+
+  leafbank-postgres:
+    image: postgres:latest
+    container_name: leafbank__postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - leafbank-postgres-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - leafbank
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  leafbank-postgres-data:
+
+networks:
+  leafbank:
+    name: "leafbank"
+    driver: "bridge"

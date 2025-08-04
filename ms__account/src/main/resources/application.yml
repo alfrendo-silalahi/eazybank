@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: ms__account
+  profiles:
+    active: prod
+  config:
+    import: "optional:configserver:http://localhost:8084"
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+
+  # Mengizinkan actuator /info untuk mengakses env dengan prefix info
+  info:
+    env:
+      enabled: true
+
+#endpoints:
+#  shutdown:
+#    enabled: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:9000/eureka
+
+# Will be used for actuator /info
+info:
+  app:
+    name: account
+    description: "Microservice account for EazyBank application"
+    version: "1.0.0"
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        permittedNumberOfCallsInHalfOpenState: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+
+  retry:
+    configs:
+      default:
+        maxAttempts: 3
+        waitDuration: 100
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+#        ignoreExceptions:
+#          - java.lang.NullPointerException
+        retryExceptions:
+          - java.util.concurrent.TimeoutException

@@ -1,0 +1,26 @@
+package dev.alfrendosilalahi.leafbank.ms__account.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "account")
+public class Account extends BaseEntity {
+
+    @Id
+    private Long id;
+
+    private String type;
+
+    private String branchAddress;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+}
